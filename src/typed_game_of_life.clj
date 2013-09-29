@@ -39,17 +39,20 @@
   {:alive? (or a1 a2)
    :neighbours (+ n1 n2)})
 
+(ann merge-cells [Cell Cell -> Cell])
+(defn merge-cells [accumulator new-cell]
+  (merge-with cell-merge accumulator new-cell))
+
+(ann tick-cell-pair ['[Coordinate CellDetails] -> Boolean])
+(defn tick-cell-pair [[coords cell-details]]
+  (cell-tick cell-details))
+
 (ann world-tick [World -> World])
 (defn world-tick [coords]
-  (letfn> [merge-cells :- [Cell Cell -> Cell]
-           (merge-cells [a c] (merge-with cell-merge a c))
-
-           tick-cell-pair :- ['[Coordinate CellDetails] -> Boolean]
-           (tick-cell-pair [[co cd]] (cell-tick cd))]
-    (->> (explode coords)
+  (->> (explode coords)
        (reduce merge-cells {})
        (filter tick-cell-pair)
        (into {})
        keys
-       (into #{}))))
+       (into #{})))
 
