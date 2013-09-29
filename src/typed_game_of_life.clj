@@ -41,15 +41,13 @@
 
 (ann world-tick [World -> World])
 (defn world-tick [coords]
-  (letfn> [merge-cells :- [Cell Cell -> Cell]
-           (merge-cells [a c] (merge-with cell-merge a c))
-
-           tick-cell-pair :- ['[Coordinate CellDetails] -> Boolean]
-           (tick-cell-pair [[co cd]] (cell-tick cd))]
-    (->> (explode coords)
-       (reduce merge-cells {})
-       (filter tick-cell-pair)
+  (->> (explode coords)
+       (reduce (ann-form #(merge-with cell-merge %1 %2)
+                         [Cell Cell -> Cell])
+               {})
+       (filter (ann-form #(cell-tick (nth % 1))
+                         ['[Coordinate CellDetails] -> Boolean]))
        (into {})
        keys
-       (into #{}))))
+       (into #{})))
 
