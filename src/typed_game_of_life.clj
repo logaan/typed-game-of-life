@@ -1,6 +1,19 @@
 (ns typed-game-of-life
   (:require [clojure.core.typed :refer :all]))
 
+(def-alias Coords
+  '[Int Int])
+
+(def-alias World
+  (Set Coords))
+
+(def-alias CellDetails
+  '{:alive? Boolean
+    :neighbours Int})
+
+(def-alias Cell
+  (Map Coords CellDetails))
+
 (ann cell-tick [CellDetails -> Boolean])
 (defn cell-tick [{:keys [alive? neighbours]}]
   {:pre [(<= 0 neighbours 8)]}
@@ -9,23 +22,10 @@
     (= neighbours 3) true
     :else            false))
 
-(def-alias Coordinate
-  '[Int Int])
-
-(def-alias World
-  (Set Coordinate))
-
-(def-alias CellDetails
-  '{:alive? Boolean
-    :neighbours Int})
-
-(def-alias Cell
-  (Map Coordinate CellDetails))
-
 (ann explode [World -> (Seq Cell)])
 (defn explode [coords]
   (for> :- Cell
-        [[x y]   :- '[Int Int] coords
+        [[x y]   :- Coords coords
          delta-x :- Int [-1 0 +1]
          delta-y :- Int [-1 0 +1]
          :let [center? (= delta-x delta-y 0)]]
@@ -43,7 +43,7 @@
 (defn merge-cells [accumulator new-cell]
   (merge-with cell-merge accumulator new-cell))
 
-(ann tick-cell-pair ['[Coordinate CellDetails] -> Boolean])
+(ann tick-cell-pair ['[Coords CellDetails] -> Boolean])
 (defn tick-cell-pair [[coords cell-details]]
   (cell-tick cell-details))
 
