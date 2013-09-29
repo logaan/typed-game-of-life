@@ -1,8 +1,5 @@
 (ns typed-game-of-life
-  (require [clojure.core.typed :refer :all])
-  (import [clojure.lang
-           IPersistentMap
-           IPersistentSet]))
+  (:require [clojure.core.typed :refer :all]))
 
 (ann cell-tick [CellDetails -> Boolean])
 (defn cell-tick [{:keys [alive? neighbours]}]
@@ -13,29 +10,28 @@
     :else            false))
 
 (def-alias Coordinate
-  '[AnyInteger AnyInteger])
+  '[Int Int])
 
 (def-alias World
-  (IPersistentSet Coordinate))
+  (Set Coordinate))
 
 (def-alias CellDetails
-  (HMap :mandatory {:alive? Boolean
-                    :neighbours AnyInteger}
-        :complete? true))
+  '{:alive? Boolean
+    :neighbours Int})
 
 (def-alias Cell
-  (IPersistentMap Coordinate CellDetails))
+  (Map Coordinate CellDetails))
 
 (ann explode [World -> (Seq Cell)])
 (defn explode [coords]
   (for> :- Cell
-        [[x y]   :- '[AnyInteger AnyInteger] coords
-         delta-x :- AnyInteger [-1 0 +1]
-         delta-y :- AnyInteger [-1 0 +1]
+        [[x y]   :- '[Int Int] coords
+         delta-x :- Int [-1 0 +1]
+         delta-y :- Int [-1 0 +1]
          :let [center? (= delta-x delta-y 0)]]
-        {[(+ x delta-x) (+ y delta-y)]
-         {:alive?     center?
-          :neighbours (if center? 0 1)}}))
+    {[(+ x delta-x) (+ y delta-y)]
+     {:alive?     center?
+      :neighbours (if center? 0 1)}}))
 
 (ann cell-merge [CellDetails CellDetails -> CellDetails])
 (defn cell-merge [{a1 :alive? n1 :neighbours}
