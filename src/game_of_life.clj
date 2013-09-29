@@ -8,7 +8,7 @@
     :else            false))
 
 (defn explode [coords]
-  (for [[x y] coords
+  (for [[x y]   coords
         delta-x [-1 0 +1]
         delta-y [-1 0 +1]
         :let [center? (= delta-x delta-y 0)]]
